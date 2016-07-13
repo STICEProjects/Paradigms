@@ -1,4 +1,13 @@
-function staging_system()
+%%Initializes psychtoolbox, prompts tester for subject information, and
+%%begins running the inputted paradigm(s).
+
+
+%%paradigm is a cell array of function handles that accept the argument
+%%list: Display information Struct, Subject information Struct, and
+%%a filepath string. 
+
+
+function staging_system(paradigm)
 
     Display = screen_init();
 
@@ -29,10 +38,13 @@ function staging_system()
     
     [maindir, ~, ~] = fileparts(which('staging_system.m'));
     
-    paradigm = input('Please enter the Paradigm you would like to run or the name of a premade set (ex: body_project or body_project_mri');
+    print('press any key to begin running paradigms');
+    KbWait;
     
-    paradigm(Subject, Display, maindir)
-    
+    for i = 1:size(paradigm)
+        paradigm{i}(Display, Subject, maindir);
+    end
+        
     
     
     

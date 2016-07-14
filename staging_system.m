@@ -36,13 +36,13 @@ function staging_system(paradigm)
         end
     end
     
-    [maindir, ~, ~] = fileparts(which('staging_system.m'));
+    [path, ~, ~] = fileparts(which('staging_system.m'));
     
     print('press any key to begin running paradigms');
     KbWait;
     
     for i = 1:size(paradigm)
-        paradigm{i}(Display, Subject, maindir);
+        paradigm{i}(Display, Subject, path);
     end
         
     

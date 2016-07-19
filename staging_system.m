@@ -7,7 +7,7 @@
 %%a filepath string. 
 
 
-function staging_system(paradigm)
+function staging_system()
 
     Display = screen_init();
 
@@ -38,13 +38,13 @@ function staging_system(paradigm)
     
     [path, ~, ~] = fileparts(which('staging_system.m'));
     
-    print('press any key to begin running paradigms');
+    print('press any key to begin running the test');
     KbWait;
     
-    for i = 1:size(paradigm)
-        paradigm{i}(Display, Subject, path);
-    end
-        
+    Joyconfig = joystick_calibration;
+    
+    
+    
     
     
     

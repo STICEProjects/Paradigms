@@ -85,14 +85,107 @@ time = mri_sync(Display);
 
 DrawFormattedText(Display.window,'We are going to show you pictures of food. \n\n Press the joystick trigger to continue.','center','center',[255 255 255],50,[],[],1.5);
 Screen('Flip', Display.window);
+joystick_wait(Joyconfig);
 
-while 1
-    Joy = get_joystick_value(Joyconfig);
-    if Joy.button1 && Joybutton2
-        break
+
+DrawFormattedText(w,'A green border will appear around the image, you will have one second to react with the joystick. \n\n Press the joystick trigger to continue.','center','center',COLORS.WHITE,50,[],[],1.5);
+Screen('Flip',w);
+joystick_wait(Joyconfig);
+
+DrawFormattedText(w,'Pull the joystick toward you for foods that you do like. \n\n Push the joystick away from you for foods that you dislike.\n\nPress the joystick trigger to begin.','center','center',COLORS.WHITE,50,[],[],1.5);
+Screen('Flip',w);
+joystick_wait(Joyconfig);
+
+for block = 1:STIM.blocks
+    for trial = 1:STIM.trials
+        tcounter = (block-1)*STIM.trials + trial;
+        tpx = imread(getfield(SimpExp,'data',{tcounter},'picname'));
+        texture = Screen('MakeTexture',w,tpx);
+        
+        % Fixation. 20160509cdt
+        DrawFormattedText(w,'+','center','center',COLORS.WHITE);
+        fixon = Screen('Flip',w);
+        SimpExp.data(tcounter).fix_onset = fixon - scan_sec;
+        WaitSecs(SimpExp.data(tcounter).jitter);
+        
+        % Intial display of food and instructions. 20160509cdt
+        Screen('DrawTexture',w,texture,[],STIM.framerect);
+%         DrawFormattedText(w,verbage,'center',(wRect(4)*.75),COLORS.WHITE);
+        if (usingKeyboard)
+            drawRatings([],w);
+        end
+        picon = Screen('Flip',w);
+        SimpExp.data(tcounter).pic_onset = picon - scan_sec;
+        WaitSecs(STIM.trialdur - STIM.rate_dur);
+        
+        % Time to rate the food. 20160509cdt
+        Screen('FillRect', w, COLORS.GREEN, STIM.framerect + [-BORDERSIZE -BORDERSIZE BORDERSIZE BORDERSIZE]);
+        Screen('DrawTexture',w,texture,[],STIM.framerect);
+%         DrawFormattedText(w,verbage,'center',(wRect(4)*.75),COLORS.GREEN);
+        if (usingKeyboard)
+            drawRatings([],w,1); %The 1 here turns everything green.
+        end
+        rateon = Screen('Flip',w);
+        SimpExp.data(tcounter).rate_onset = rateon - scan_sec;
+        
+        FlushEvents();
+        telap = 0;
+        while telap < STIM.rate_dur
+            telap = GetSecs() - rateon;
+            
+            if (usingKeyboard)
+                [keyisdown, rt, keycode] = KbCheck();
+                if (keyisdown==1 && any(keycode(KEYS.all)))
+                    SimpExp.data(tcounter).rate_RT = rt - rateon;
+
+                    rating = KbName(find(keycode));
+                    rating = str2double(rating(1));
+
+                    Screen('DrawTexture',w,texture,[],STIM.framerect);
+                    drawRatings(keycode,w,1);
+%                     DrawFormattedText(w,verbage,'center',(wRect(4)*.75),COLORS.GREEN);
+                    Screen('Flip',w);
+                    WaitSecs(.25);
+                    if fmri == 1;
+                        rating = rating + 1;
+                    elseif fmri == 0 && rating == 0
+                        rating = 10;
+                    end
+
+                    SimpExp.data(tcounter).rating = rating;
+                    break;
+                end
+            else % using joystick 20160509cdt
+                n = 0;
+                [x, y, z, buttons] = WinJoystickMex(n);
+                if (y < joystickCenter - joystickSensitivity)
+                    if isnan(SimpExp.data(tcounter).rate_RT)
+                        SimpExp.data(tcounter).rate_RT = GetSecs() - rateon;
+                    end
+                    Screen('FillRect', w, COLORS.GREEN, STIM.framerectfar + [-BORDERSIZE -BORDERSIZE BORDERSIZE BORDERSIZE]);
+                    Screen('DrawTexture',w,texture,[],STIM.framerectfar);
+%                     DrawFormattedText(w,verbage,'center',(wRect(4)*.75),COLORS.GREEN);
+                    Screen('Flip',w);
+                    SimpExp.data(tcounter).rating = 1;
+                    %WaitSecs(.25);
+                    fprintf('%d %d %d - %d %d %d %d \n', x, y, z, buttons(1), buttons(2), buttons(3), buttons(4));
+                elseif (y > joystickCenter + joystickSensitivity)
+                    if isnan(SimpExp.data(tcounter).rate_RT)
+                        SimpExp.data(tcounter).rate_RT = GetSecs() - rateon;
+                    end
+                    Screen('FillRect', w, COLORS.GREEN, STIM.framerectnear + [-BORDERSIZE -BORDERSIZE BORDERSIZE BORDERSIZE]);
+                    Screen('DrawTexture',w,texture,[],STIM.framerectnear);
+%                     DrawFormattedText(w,verbage,'center',(wRect(4)*.75),COLORS.GREEN);
+                    Screen('Flip',w);
+                    SimpExp.data(tcounter).rating = 9;
+                    %WaitSecs(.25);
+                    fprintf('%d %d %d - %d %d %d %d \n', x, y, z, buttons(1), buttons(2), buttons(3), buttons(4));
+                end
+
+            end
+        end        
     end
-end
-
+end %STARTHEREANDDELETETHISTOMORROW
 
 
 

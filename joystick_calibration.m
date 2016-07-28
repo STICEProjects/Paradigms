@@ -1,24 +1,19 @@
-function [Defaultjoy] = joystick_calibration(type)
-   
-    Display = screen_init();
+function [Defaultjoy] = joystick_calibration(Display, type)
     
     if isequal(type, 'logitech') 
-    Defaultjoy.center = [32767, 32767];
-    Defaultjoy.xmod = .0004;
-    Defaultjoy.ymod = .0004;
-    Defaultjoy.deadzone = 5000;
+        Defaultjoy.center = [32767, 32767];
+        Defaultjoy.xmod = .0004;
+        Defaultjoy.ymod = .0004;
+        Defaultjoy.deadzone = 5000;
+    elseif isequal(type, 'mri')
+            
+        else print('invalid argument'); return;
+    end
     
     Cursor.color = [255 255 255];
     Cursor.position = [960, 540];
     
     Priority(Display.priority);
-    else
-        if isequal(type, 'mri')
-            
-        else print('invalid argument'); return;
-        end
-    end
-    
     
     Screen('Flip', Display.window);
 
@@ -43,7 +38,6 @@ DrawFormattedText(Display.window,'Thank you, the calibration is complete. Please
 Screen('Flip', Display.window);
 pause(2);
 KbWait;
-sca
     
     
 

@@ -9,9 +9,9 @@
 
 function staging_system()
 
-    Display = screen_init();
 
     rng('shuffle');
+    pause('on');
     
     prompt={'SUBJECT ID' 'Session' 'MRI (1 = Y, 0 = N)'};
     defAns={'4444' '0' '0'};
@@ -20,28 +20,52 @@ function staging_system()
     prompt2={'Binges' 'Sick' 'Laxatives/diruretics' 'Diet pills' 'Fasting' 'Exercise'};
     behaviors={'0' '0' '0' '0' '0' '0'};
 
-
+    
+       
     answer=inputdlg(prompt,'Please input subject info',1,defAns);
+    
+    
+  
+    
 
+    
     negbehav= inputdlg(prompt2,'Please input behaviors',1,behaviors);
     
-    Subject.id = str2int(answer{1});
-    Subject.session = str2int(answer{2});
-    Subject.mri = logical(str2int(answer{3}));
+    Subject.id = str2double(answer{1});
+    Subject.session = str2double(answer{2});
+    Subject.mri = logical(str2double(answer{3}));
     
-    a = str2int(negbehav);
+    %{
+    
+    a = str2double(negbehav);
+    
     for i = 1:size(a,1)
         if a(i)
             Subject.eval(end+1) = importdata(textfileNames{i});
         end
     end
     
+    
+    %}
+    
     [path, ~, ~] = fileparts(which('staging_system.m'));
     
-    print('press any key to begin running the test');
+    Display = screen_init('Debug');
+    
+    disp('[Press any key to begin running the test]');
     KbWait;
     
-    Joyconfig = joystick_calibration;
+    pause(2);
+    
+    Joyconfig = joystick_calibration(Display, 'logitech');
+    KbWait;
+    
+    
+   
+    
+    pause(2);
+    exposure(Display, Joyconfig, Subject, path, 'food')
+    
     
     
     

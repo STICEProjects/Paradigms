@@ -1,19 +1,19 @@
 function exposure(Display, Joyconfig, Subject, path, arg)
 
-
+d = clock;
 
 Config.imagecount = 20;
-Config.trials = 2*config.imagecount;
+Config.trials = 2*Config.imagecount;
 Config.trialdur = 2;
 Config.rate_dur = 1;
 Config.date = sprintf('%s %2.0f:%02.0f',date, d(4), d(5));
-if fmri == 1
+if Subject.mri == 1
     Config.jitter = [4 5 6 8];
 else Config.jitter = 2;
 end
 
-ratepath = string('"%s"/Rating', arg);
-picpath = string('"%s"/Pics', arg);
+ratepath = char(['./Data/' arg '/Ratings']);
+picpath = char(['./Data/' arg '/Pics']);
 
 Pics.rating = fullfile(path, ratepath);
 Pics.dir = fullfile(path, picpath);
@@ -47,27 +47,27 @@ end
 
 cd(Pics.dir);
 
-Pics.high = struct('name',{p.PicRating_Food.H(1:n_images).name}');
-Pics.low = struct('name',{p.PicRating_Food.U(1:n_images).name}');
+Pics.high = struct('name',{p.PicRating_Food.H(1:Config.imagecount).name}');
+Pics.low = struct('name',{p.PicRating_Food.U(1:Config.imagecount).name}');
 
 if isempty(Pics.high) || isempty(Pics.low)
     error('Could not find pics. Please ensure pictures are found in a folder names IMAGES within the folder containing the .m task file.');
 end
 
-pictype = [ones(n_images,1); zeros(n_images,1)];
-piclist = [randperm(n_images)'; randperm(n_images)'];
+pictype = [ones(Config.imagecount,1); zeros(Config.imagecount,1)];
+piclist = [randperm(Config.imagecount)'; randperm(Config.imagecount)'];
 trial_types = [pictype piclist];
 order = trial_types(randperm(size(trial_types,1)),:);
-Trial.data = struct.empty(Config.trials);
-jitter = BalanceTrials(Config.blocks*Config.trials,1,Config.jitter);
+Trial.data = struct.empty(Config.trials, 0);
+jitter = BalanceTrials(Config.trials,1,Config.jitter);
 
 for i = 1:Config.trials;
     Trial.data(i).pictype = order(i,1);
 
     if order(i,1) == 1
-    Trial.data(i).picname = Pics.high(order(i,2)).name;
+        Trial.data(i).picname = Pics.high(order(i,2)).name;
 	elseif order(i,1) == 0
-        data(i).picname = Pics.low(order(i,2)).name;
+        Trial.data(i).picname = Pics.low(order(i,2)).name;
     end
          
 	Trial.data(i).jitter = jitter(i);
@@ -81,70 +81,78 @@ end
 commandwindow;
 
 
+
 Time.start = mri_sync(Display);
+pause(1);
 
 DrawFormattedText(Display.window,'We are going to show you pictures of food. \n\n Press the joystick trigger to continue.','center','center',[255 255 255],50,[],[],1.5);
 Screen('Flip', Display.window);
 joystick_wait(Joyconfig);
+pause(1);
 
-DrawFormattedText(w,'A green border will appear around the image, you will have one second to react with the joystick. \n\n Press the joystick trigger to continue.','center','center',COLORS.WHITE,50,[],[],1.5);
-Screen('Flip',w);
+DrawFormattedText(Display.window,'A green border will appear around the image, you will have one second to react with the joystick. \n\n Press the joystick trigger to continue.','center','center',[255 255 255],50,[],[],1.5);
+Screen('Flip', Display.window);
 joystick_wait(Joyconfig);
+pause(1);
 
-DrawFormattedText(w,'Pull the joystick toward you for foods that you do like. \n\n Push the joystick away from you for foods that you dislike.\n\nPress the joystick trigger to begin.','center','center',COLORS.WHITE,50,[],[],1.5);
-Screen('Flip',w);
+DrawFormattedText(Display.window,'Pull the joystick toward you for foods that you do like. \n\n Push the joystick away from you for foods that you dislike.\n\nPress the joystick trigger to begin.','center','center',[255 255 255], 50,[],[],1.5);
+Screen('Flip', Display.window);
 joystick_wait(Joyconfig);
-
+pause(1);
 
 for i = 1:Config.trials
-    texture = Screen('MakeTexture', Display.window, imread(getfield(Trial,'data',{tcounter},'picname')));
-    Time.onset = draw_fixation_cross(Display, SimpExp.data(i).jitter);
-    SimpExp.data(i).fix_onset = Time.onset - Time.start;
+    ptr = imread(getfield(Trial,'data',{i},'picname'));
+    texture = Screen('MakeTexture', Display.window, ptr);
+    Time.onset = draw_fixation_cross(Display, Trial.data(i).jitter);
+    Trial.data(i).fix_onset = Time.onset - Time.start;
     
-    Screen('FillRect', w, [0 0 255], STIM.framerect + [-100 -100 100 100]);
-    Screen('DrawTexture',Display.window,texture,[],STIM.framerect);
-    Time.onset = Screen('Flip',w);
-    Trial.data(tcounter).pic_onset = Time.onset - Time.start;
+    Screen('FillRect', Display.window, [255 0 0], (Display.imagerect + [-50 -50 50 50]));
+    Screen('DrawTexture', Display.window, texture, [], Display.imagerect);
+    Time.onset = Screen('Flip',Display.window);
+    Trial.data(i).pic_onset = Time.onset - Time.start;
     WaitSecs(Config.trialdur - Config.rate_dur);
     
-    Screen('FillRect', w, [0 255 0], STIM.framerect + [-100 -100 100 100]);
-    Screen('DrawTexture',w,texture,[],STIM.framerect);
-    Time.onset = Screen('Flip',w);
-    SimpExp.data(i).rate_onset = Time.onset - scan_sec;
+    Screen('FillRect', Display.window, [0 255 0], Display.imagerect + [-50 -50 50 50]);
+    Screen('DrawTexture',Display.window,texture,[],Display.imagerect);
+    Time.onset = Screen('Flip',Display.window);
+    Trial.data(i).rate_onset = Time.onset - Time.start;
         
-    FlushEvents();
     Time.response = 0;
     while Time.response < Config.rate_dur
             
         Time.response = GetSecs() - Time.onset;
             
         Input = get_joystick_value(Joyconfig);
-        if Input.y > 5*Joyconfig.ymod
-            Screen('FillRect', Display.window, [0 255 0], STIM.bigrect + [-BORDERSIZE -BORDERSIZE BORDERSIZE BORDERSIZE]);
-            Screen('DrawTexture', Display.window, texture, [], STIM.framerectfar);
-            Screen('Flip',w);
-            SimpExp.data(i).rating = 9;
-            Config.rate_RT = GetSecs - Time.onset;
-
-            Trial.data(i)
-            break
-        elseif Input.y < 5*Joyconfig.ymod
-            Screen('FillRect', Display.window, [0 255 0], STIM.smallrect + [-BORDERSIZE -BORDERSIZE BORDERSIZE BORDERSIZE]);
-            Screen('DrawTexture',Display.window, texture, [], STIM.smallrect);
+        if Input.y > 8 * Joyconfig.ymod
+            Screen('FillRect', Display.window, [0 255 0], Display.largeimagerect + [-75 -75 75 75]);
+            Screen('DrawTexture', Display.window, texture, [], Display.largeimagerect);
             Screen('Flip',Display.window);
-            SimpExp.data(i).rating = 1;
-            Config.rate_RT = GetSecs - Time.onset;
+            Trial.data(i).rating = 9;
+            Trial.data(i).rate_RT = GetSecs - Time.onset;
 
             Trial.data(i)
+            pause(.5);
+            break
+        elseif Input.y < -8 * Joyconfig.ymod
+            Screen('FillRect', Display.window, [0 255 0], Display.smallimagerect + [-25 -25 25 25]);
+            Screen('DrawTexture',Display.window, texture, [], Display.smallimagerect);
+            Screen('Flip',Display.window);
+            Trial.data(i).rating = 1;
+            Trial.data(i).rate_RT = GetSecs - Time.onset;
+
+            Trial.data(i)
+            pause(.5);
             break
 
         end
     end        
 end
 
+Trial.data
 
+%{
 
-savepath = string('"%s"/"%s"/Results', path, arg);
+savepath = char('"%s"/"%s"/Results', path, arg);
 
 % cd(savedir)
 savename = ['SimpExp_Food_' num2str(ID)];
@@ -164,12 +172,14 @@ out_data = transpose(struct2cell(transpose(Trial.data)));
 xlswrite([savedir xls_savename], out_data);
 print('saved xls file');
 
+%}
 
-DrawFormattedText(w,'That concludes this task.','center','center',COLORS.WHITE);
-Screen('Flip', w);
+DrawFormattedText(Display.window,'That concludes this task.','center','center', [255 255 255]);
+Screen('Flip', Display.window);
 KbWait();
+pause(1);
 
-sca
+Screen('Flip', Display.window);
 
 end
 

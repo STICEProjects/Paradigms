@@ -1,8 +1,10 @@
+
 %%Initializes psychtoolbox, prompts tester for subject information, and
 %%begins running the inputted paradigm(s).
 
 
 %%paradigm is a cell array of function handles that accept the argument
+
 %%list: Display information Struct, Subject information Struct, and
 %%a filepath string. 
 
@@ -10,9 +12,8 @@
 function staging_system()
 
 
-    rng('shuffle');
+    rng('shuffle'); 
     pause('on');
-    
     prompt={'SUBJECT ID' 'Session' 'MRI (1 = Y, 0 = N)'};
     defAns={'4444' '0' '0'};
 
@@ -21,16 +22,11 @@ function staging_system()
     behaviors={'0' '0' '0' '0' '0' '0'};
 
     
-       
     answer=inputdlg(prompt,'Please input subject info',1,defAns);
-    
-    
-  
-    
-
     
     negbehav= inputdlg(prompt2,'Please input behaviors',1,behaviors);
     
+      
     Subject.id = str2double(answer{1});
     Subject.session = str2double(answer{2});
     Subject.mri = logical(str2double(answer{3}));
@@ -50,20 +46,21 @@ function staging_system()
     
     [path, ~, ~] = fileparts(which('staging_system.m'));
     
-    Display = screen_init('Debug');
+    Display = screen_init();
     
     disp('[Press any key to begin running the test]');
     KbWait;
-    
-    pause(2);
-    
-    Joyconfig = joystick_calibration(Display, 'logitech');
-    KbWait;
-    
-    
    
+        
+    %pause(2);
     
-    pause(2);
+    
+    
+    Joyconfig = joystick_calibration(Display, 'mri');
+    KbWait;
+    pause (2);
+    disp(Display)
+
     exposure(Display, Joyconfig, Subject, path, 'food')
     
     

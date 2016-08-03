@@ -82,7 +82,7 @@ commandwindow;
 
 
 
-Time.start = mri_sync(Display);
+Time.start = GetSecs(); %mri_sync(Display);
 pause(1);
 
 DrawFormattedText(Display.window,'We are going to show you pictures of food. \n\n Press the joystick trigger to continue.','center','center',[255 255 255],50,[],[],1.5);
@@ -123,7 +123,7 @@ for i = 1:Config.trials
         Time.response = GetSecs() - Time.onset;
             
         Input = get_joystick_value(Joyconfig);
-        if Input.y > 8 * Joyconfig.ymod
+        if Input.y > 16 * Joyconfig.ymod
             Screen('FillRect', Display.window, [0 255 0], Display.largeimagerect + [-75 -75 75 75]);
             Screen('DrawTexture', Display.window, texture, [], Display.largeimagerect);
             Screen('Flip',Display.window);
@@ -176,7 +176,7 @@ print('saved xls file');
 
 DrawFormattedText(Display.window,'That concludes this task.','center','center', [255 255 255]);
 Screen('Flip', Display.window);
-KbWait();
+KbName();
 pause(1);
 
 Screen('Flip', Display.window);

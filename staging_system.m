@@ -42,28 +42,27 @@ function staging_system()
     end
     
     
-    %}
+    % } 
     
     [path, ~, ~] = fileparts(which('staging_system.m'));
     
     Display = screen_init();
     
     disp('[Press any key to begin running the test]');
-    KbWait;
+    KbName;
    
         
     %pause(2);
     
     
     
-    Joyconfig = joystick_calibration(Display, 'mri');
-    KbWait;
-    pause (2);
+    Joyconfig = joystick_calibration(Display, 'mac');
+    KbName
     disp(Display)
 
-    exposure(Display, Joyconfig, Subject, path, 'food')
+     exposure(Display, Joyconfig, Subject, path, 'food')
     
-    
+                                    
     
     
     

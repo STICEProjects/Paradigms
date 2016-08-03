@@ -5,12 +5,19 @@ function [Defaultjoy] = joystick_calibration(Display, type)
         Defaultjoy.xmod = .0004;
         Defaultjoy.ymod = .0004;
         Defaultjoy.deadzone = 5000;
-    elseif isequal(type, 'mri')
+    elseif isequal(type, 'mri') %CENTER NOT ACCURATE
         Defaultjoy.center = [33153, 33346]; %MINY = ~13000 MAXY= 41000 MINX = 19000 MAXX = 52000 ADJUST THE CENTER!
         Defaultjoy.xmod = .0008;
         Defaultjoy.ymod = .0008;
         Defaultjoy.deadzone = 1000;
+    elseif isequal(type, 'mac') %CENTER NOT ACCURATE
+        Defaultjoy.mac = 1;
+        Defaultjoy.center = [672 31];
+        Defaultjoy.xmod = .001;
+        Defaultjoy.ymod = .001;
+        Defaultjoy.deadzone = 3000;
         else print('invalid argument'); return;
+            
     end
     
     Cursor.color = [255 255 255];
@@ -20,7 +27,7 @@ function [Defaultjoy] = joystick_calibration(Display, type)
     
     Screen('Flip', Display.window);
 
-    flag = [0 0 0 0]
+    flag = [0 0 0 0];
     keyisdown = 0;
     while keyisdown == 0
         Screen('DrawDots', Display.window, Cursor.position, 20, Cursor.color, [], 2);
@@ -28,6 +35,7 @@ function [Defaultjoy] = joystick_calibration(Display, type)
         Screen('Flip', Display.window);
         
         [keyisdown,~,~] = KbCheck;
+        
         
         Joy = get_joystick_value(Defaultjoy);
         Cursor.position = [Joy.x + Cursor.position(1), Joy.y + Cursor.position(2)];
@@ -47,7 +55,7 @@ function [Defaultjoy] = joystick_calibration(Display, type)
             flag(4) = 1;
         end
         
-        if isequal(flag, [1 1 1 1]) || keyisdown
+        if   KbName
             break
         end
         
@@ -59,8 +67,7 @@ function [Defaultjoy] = joystick_calibration(Display, type)
     
 DrawFormattedText(Display.window,'Thank you, the calibration is complete. Please wait','center','center',[255 255 255],50,[],[],1.5);
 Screen('Flip', Display.window);
-pause(2);
-KbWait;
+KbName;
     
     
 

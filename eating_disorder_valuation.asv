@@ -7,9 +7,8 @@ function eating_disorder_valuation(Display, Joyconfig, Subject, path)
     
     Config.stimuluscount = 20;
     
- 
-    Stimulus.eds = importdata('Binge.txt'); %%%%
-    Config.edcount = length(Subject.eds);
+    Stimulus.eds = %%%
+    Config.edcount = length(Subject.edlist);
     Stimulus.scenarios = importdata('scenarios.txt');
     Config.scenariocount = length(Stimulus.scenarios);
     Stimulus.neutrals = importdata('neutral_behav.txt');
@@ -65,19 +64,17 @@ function eating_disorder_valuation(Display, Joyconfig, Subject, path)
         end
         
         [Data.behavior1_rating, Data.behavior1_responsetime] = display_stimulus_rating(Display, Stimulus.verbage1, Data.behavior1, 5);
-        draw_fixation_cross(Display, Config.jitter(trial)); %%%%
+        draw_fixation_cross(Display, Config.jitter(trial));
         
         [Data.behavior2_rating, Data.behavior2_responsetime] = display_stimulus_rating(Display, Stimulus.verbage1, Data.behavior2, 5);  
         draw_fixation_cross(Display, Config.jitter(trial));
         
-        [Data.choice_rating, Data.choice_responsetime] = display_stimulus_choice(Display, Joyconfig, Stimulus.verbage2, Data.choice_left, Data.choice_right, 5);
-        draw_fixation_cross(Display, Config.jitter(trial));
+        [Data.choice_rating, Data.choice_responsetime] = display_stimulus_choice(Display, Stimulus.verbage2, Data.choice_left, Data.choice_right, 5);
         
-        disp(Data)
+        DrawFormattedText(Display.window,'That concludes this task. The assessor will be with you soon.','center','center',COLORS.WHITE);
+        Screen('Flip', Display.window);
+
     end
-        
-    DrawFormattedText(Display.window,'That concludes this task. The assessor will be with you soon.','center','center',[255 255 255]);
-    Screen('Flip', Display.window);
     
 
     

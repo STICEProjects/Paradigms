@@ -55,7 +55,7 @@ function [Defaultjoy] = joystick_calibration(Display, type)
             flag(4) = 1;
         end
         
-        if   KbName
+        if   KbName % || isequal(flag, [1 1 1 1])
             break
         end
         

@@ -42,7 +42,7 @@ function staging_system()
     end
     
     
-    % } 
+    %} 
     
     [path, ~, ~] = fileparts(which('staging_system.m'));
     
@@ -55,12 +55,18 @@ function staging_system()
     %pause(2);
     
     
+    Gamepad();
     
     Joyconfig = joystick_calibration(Display, 'mac');
     KbName
     disp(Display)
 
-     exposure(Display, Joyconfig, Subject, path, 'food')
+    %exposure(Display, Joyconfig, Subject, path, 'Food');
+    KbName;
+    exposure(Display, Joyconfig, Subject, path, 'Model');
+    
+    Gamepad('Unplug');
+end
     
                                     
     

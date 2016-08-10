@@ -5,6 +5,12 @@ function ED_valuation()
 
     global wRect w XCENTER rects mids COLORS KEYS joystickCenter telap rateon MRI
 
+    Defaultjoy.center = [672 31];
+    Defaultjoy.xmod = .00003;
+    Defaultjoy.ymod = .00003;
+    Defaultjoy.deadzone = 2000;
+    Defaultjoy.mac = 1;
+    
     prompt={'SUBJECT ID' 'Session' 'MRI (1 = Y, 0 = N)'};
     defAns={'4444' '0' '0'};
 
@@ -61,7 +67,7 @@ function ED_valuation()
     rangetest = cell2mat(struct2cell(KEYS));
     KEYS.all = min(rangetest):max(rangetest);
     % KEYS.trigger = KbName('''"');
-    KEYS.trigger = KbName('''');
+    %KEYS.trigger = KbName('''');
 
     %%
     [mfilesdir,~,~] = fileparts(which('ED_valuation.m'));
@@ -91,7 +97,7 @@ function ED_valuation()
 
     %%
     %change this to 0 to fill whole screen
-    DEBUG=1;
+    DEBUG=0;
     clear Screen;
     %set up the screen and dimensions
 
@@ -137,14 +143,14 @@ function ED_valuation()
     DrawFormattedText(w,'You are going to imagine yourself in scenarios, then rate how likely you are to engage in a behavior.\n\n You will use a scale from 1 to 9, where 1 is "Not at all likely" and 9 is "Extremely likely."\n\nPress the joystick to continue.','center','center',COLORS.WHITE,50,[],[],1.5);
     Screen('Flip',w);
     %KbWait([],3);
-    JoystickButtonWait();
+    joystick_wait(Defaultjoy);
 
     FlushEvents();
     
     DrawFormattedText(w,'You will use joystick and its trigger to select your rating.\n\nPress the joystick trigger to continue.','center','center',COLORS.WHITE,50,[],[],1.5);
     Screen('Flip',w);
     %KbWait([],3);
-    JoystickButtonWait();
+    joystick_wait(Defaultjoy);
 
     FlushEvents();
     
@@ -172,7 +178,7 @@ function ED_valuation()
     DrawFormattedText(w,'The rating task will now begin.\n\nPress the joystick trigger continue.','center','center',COLORS.WHITE,50,[],[],1.5);
     Screen('Flip',w);
     %KbWait([],3);
-    JoystickButtonWait();
+    joystick_wait(Defaultjoy);
     WaitSecs(1);
 
     jitter_idx = 0; 
@@ -264,7 +270,7 @@ function ED_valuation()
         DrawFormattedText(w,'Press the joystick trigger when you are ready to continue','center','center',COLORS.WHITE);
         Screen('Flip',w);
         %KbWait([],3);
-        JoystickButtonWait();
+        joystick_wait(Defaultjoy);
     end   
     
     filename = ['ED_valuation' '_sub' answer{1} '_sess' answer{2} '.mat'];
@@ -294,7 +300,7 @@ function [rating, rt] = ShowStimChoice(w, text1, text2, duration)
     Defaultjoy.xmod = .00003;
     Defaultjoy.ymod = .00003;
     Defaultjoy.deadzone = 2000;
-    Defaultjoy.mac = 0;
+    Defaultjoy.mac = 1;
     
     
     DrawFormattedText(w,text1,'center','center',COLORS.WHITE);
@@ -398,22 +404,6 @@ end
 
 
 %%
-function key_time = JoystickButtonWait(varargin)
-    FlushEvents();
-    while 1
-        [x, y, z, buttons] = WinJoystickMex(0);
-        if sum(buttons) == 0
-            break;
-        end
-    end
-    while 1
-        [x, y, z, buttons] = WinJoystickMex(0);
-        if sum(buttons) > 0
-            break;
-        end
-        WaitSecs(0.10);
-    end
-end
 
 
 %% broken as of 20160513cdt
@@ -452,11 +442,11 @@ function [rating, rt] = GetJoystickValue(rating)
 
         global telap rateon MRI ;
     rt = 0;
-    Defaultjoy.center = [32767, 32767];
-    Defaultjoy.xmod = .00003;
-    Defaultjoy.ymod = .00003;
-    Defaultjoy.deadzone = 1000;
-    Defaultjoy.mac = 0;
+    Defaultjoy.center = [672 31];
+    Defaultjoy.xmod = .00001;
+    Defaultjoy.ymod = .00001;
+    Defaultjoy.deadzone = 2000;
+    Defaultjoy.mac = 1;
     
 
     if MRI == 1
@@ -531,7 +521,7 @@ function drawRatings(varargin)
         if length(key)>1
             key=key(1);
         end;
-
+        choice = 5;
         switch key
 
             case {KEYS.ONE}
@@ -552,12 +542,10 @@ function drawRatings(varargin)
                 choice=8;
             case {KEYS.NINE}
                 choice=9;
-            case {KEYS.TEN}
-                choice = 10;
         end
 
         if exist('choice','var')
-            colors(:,choice)=COLORS.GREEN';
+            colors(choice)=COLORS.GREEN';
         end
     end
 

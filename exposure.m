@@ -1,14 +1,13 @@
 function exposure(Display, Joyconfig, Subject, path, arg)
 
 d = clock;
-
 Config.imagecount = 20;
 Config.trials = 2*Config.imagecount;
 Config.trialdur = 2;
 Config.rate_dur = 1;
 Config.date = sprintf('%s %2.0f:%02.0f',date, d(4), d(5));
 if Subject.mri == 1
-    Config.jitter = [4 5 6 8];
+    Config.jitter = [4 5 6 7 8];
 else Config.jitter = 2;
 end
 
@@ -26,7 +25,7 @@ end
 
 
 
-Pics.filename = sprintf('PicRate_Food%d.mat', Subject.id);
+Pics.filename = sprintf('PicRate_%s%d.mat', arg, Subject.id);
 try
     p = open(Pics.filename);
 catch
@@ -36,8 +35,13 @@ catch
     if randopics == 1
         cd(Pics.dir)
         p = struct;
-        p.PicRating_Food.H = dir('He*');
-        p.PicRating_Food.U = dir('Binge*');
+        if isequal(arg, 'Food')
+            p.PicRating_Food.H = dir('He*');
+            p.PicRating_Food.U = dir('Binge*');
+        elseif isequal(arg, 'Model')
+            p.PicRating_Food.H = dir('Av*');
+            p.PicRating_Food.U = dir('Th*');
+        end
 
     else
         error('Task cannot proceed without images. Contact Erik (elk@uoregon.edu) if you have continued problems.')
@@ -85,7 +89,8 @@ commandwindow;
 Time.start = GetSecs(); %mri_sync(Display);
 pause(1);
 
-DrawFormattedText(Display.window,'We are going to show you pictures of food. \n\n Press the joystick trigger to continue.','center','center',[255 255 255],50,[],[],1.5);
+text = char(['We are going to show you pictures of ' arg '. \n\n Press the joystick trigger to continue.');
+DrawFormattedText(Display.window,text,'center','center',[255 255 255],50,[],[],1.5);
 Screen('Flip', Display.window);
 joystick_wait(Joyconfig);
 pause(1);
@@ -95,10 +100,14 @@ Screen('Flip', Display.window);
 joystick_wait(Joyconfig);
 pause(1);
 
-DrawFormattedText(Display.window,'Pull the joystick toward you for foods that you do like. \n\n Push the joystick away from you for foods that you dislike.\n\nPress the joystick trigger to begin.','center','center',[255 255 255], 50,[],[],1.5);
+if isequal(arg, 'Food')
+    DrawFormattedText(Display.window,'Pull the joystick toward you for foods that you do like. \n\n Push the joystick away from you for images that you dislike.\n\nPress the joystick trigger to begin.','center','center',[255 255 255], 50,[],[],1.5);
+else
+    
 Screen('Flip', Display.window);
 joystick_wait(Joyconfig);
 pause(1);
+
 
 for i = 1:Config.trials
     ptr = imread(getfield(Trial,'data',{i},'picname'));
@@ -106,7 +115,7 @@ for i = 1:Config.trials
     Time.onset = draw_fixation_cross(Display, Trial.data(i).jitter);
     Trial.data(i).fix_onset = Time.onset - Time.start;
     
-    Screen('FillRect', Display.window, [255 0 0], (Display.imagerect + [-50 -50 50 50]));
+    %Screen('FillRect', Display.window, [255 0 0], (Display.imagerect + [-50 -50 50 50]));
     Screen('DrawTexture', Display.window, texture, [], Display.imagerect);
     Time.onset = Screen('Flip',Display.window);
     Trial.data(i).pic_onset = Time.onset - Time.start;
@@ -180,6 +189,7 @@ KbName();
 pause(1);
 
 Screen('Flip', Display.window);
+
 
 end
 

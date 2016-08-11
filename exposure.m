@@ -1,7 +1,7 @@
 function exposure(Display, Joyconfig, Subject, path, arg)
 
     d = clock;
-    Config.imagecount = 20;
+    Config.imagecount = 3;
     Config.trials = 2*Config.imagecount;
     Config.trialdur = 2;
     Config.rate_dur = 1;
@@ -10,6 +10,25 @@ function exposure(Display, Joyconfig, Subject, path, arg)
         Config.jitter = [4 5 6 7 8];
     else Config.jitter = 2;
     end
+    
+    %Image frame config
+    if isequal(arg, 'Food')
+        im_width = 600;
+        im_height = 450;
+    elseif isequal(arg, 'Model')
+        im_width = 350;
+        im_height = 630;
+    else disp('error: invalid argument "arg"')
+        return
+    end
+    
+    near_scale = 1.5;
+    far_scale = 0.5;    
+    im_center = [Display.center(1) Display.center(2) Display.center(1) Display.center(2)];
+    im_rect = [-im_width/2 -im_height/2 im_width/2 im_height/2];
+    Config.imagerect = im_center + im_rect;
+    Config.smallimagerect = im_center + im_rect * far_scale;
+    Config.largeimagerect = im_center + im_rect * near_scale;
 
     ratepath = char(['./Data/' arg '/Ratings']);
     picpath = char(['./Data/' arg '/Pics']);
@@ -115,14 +134,14 @@ function exposure(Display, Joyconfig, Subject, path, arg)
         Time.onset = draw_fixation_cross(Display, Trial.data(i).jitter);
         Trial.data(i).fix_onset = Time.onset - Time.start;
 
-        %Screen('FillRect', Display.window, [255 0 0], (Display.imagerect + [-50 -50 50 50]));
-        Screen('DrawTexture', Display.window, texture, [], Display.imagerect);
+        %Screen('FillRect', Display.window, [255 0 0], (Config.imagerect + [-50 -50 50 50]));
+        Screen('DrawTexture', Display.window, texture, [], Config.imagerect);
         Time.onset = Screen('Flip',Display.window);
         Trial.data(i).pic_onset = Time.onset - Time.start;
         WaitSecs(Config.trialdur - Config.rate_dur);
 
-        Screen('FillRect', Display.window, [0 255 0], Display.imagerect + [-50 -50 50 50]);
-        Screen('DrawTexture',Display.window,texture,[],Display.imagerect);
+        Screen('FillRect', Display.window, [0 255 0], Config.imagerect + [-50 -50 50 50]);
+        Screen('DrawTexture',Display.window,texture,[],Config.imagerect);
         Time.onset = Screen('Flip',Display.window);
         Trial.data(i).rate_onset = Time.onset - Time.start;
 
@@ -133,8 +152,8 @@ function exposure(Display, Joyconfig, Subject, path, arg)
 
             Input = get_joystick_value(Joyconfig);
             if Input.y > 16 * Joyconfig.ymod
-                Screen('FillRect', Display.window, [0 255 0], Display.largeimagerect + [-75 -75 75 75]);
-                Screen('DrawTexture', Display.window, texture, [], Display.largeimagerect);
+                Screen('FillRect', Display.window, [0 255 0], Config.largeimagerect + [-75 -75 75 75]);
+                Screen('DrawTexture', Display.window, texture, [], Config.largeimagerect);
                 Screen('Flip',Display.window);
                 Trial.data(i).rating = 9;
                 Trial.data(i).rate_RT = GetSecs - Time.onset;
@@ -143,8 +162,8 @@ function exposure(Display, Joyconfig, Subject, path, arg)
                 pause(.5);
                 break
             elseif Input.y < -8 * Joyconfig.ymod
-                Screen('FillRect', Display.window, [0 255 0], Display.smallimagerect + [-25 -25 25 25]);
-                Screen('DrawTexture',Display.window, texture, [], Display.smallimagerect);
+                Screen('FillRect', Display.window, [0 255 0], Config.smallimagerect + [-25 -25 25 25]);
+                Screen('DrawTexture',Display.window, texture, [], Config.smallimagerect);
                 Screen('Flip',Display.window);
                 Trial.data(i).rating = 1;
                 Trial.data(i).rate_RT = GetSecs - Time.onset;
@@ -156,32 +175,29 @@ function exposure(Display, Joyconfig, Subject, path, arg)
             end
         end        
     end
-
+    Screen('Flip', Display.window);
     Trial.data
 
-    %{
 
-    savepath = char('"%s"/"%s"/Results', path, arg);
+    savepath = char([path '/Data/' arg '/Results']);
 
-    % cd(savedir)
-    savename = ['SimpExp_Food_' num2str(ID)];
+    cd(savepath)
+    savename = ['SimpExp_Food_' num2str(Subject.id)];
 
-    if exist(savename,'file')==2;
+    if exist(savename,'file')== 2;
         savename = ['SimpExp_Food_' num2str(Subject.id) '_' sprintf('%s_%2.0f%02.0f',Config.date,d(4),d(5))];
     end
 
     mat_savename = [savename '.mat'];
     xls_savename = [savename '.xls'];
 
-    save([savepath mat_savename],'Trial');
-    print('saved mat file');
+    save(mat_savename,'Trial');
+    disp('saved mat file');
 
     fields = transpose(fieldnames(Trial.data));
     out_data = transpose(struct2cell(transpose(Trial.data)));
-    xlswrite([savedir xls_savename], out_data);
-    print('saved xls file');
-
-    %}
+    xlswrite(xls_savename, [fields; out_data]);
+    disp('saved xls file');
 
     DrawFormattedText(Display.window,'That concludes this task. Please wait','center','center', [255 255 255]);
     Screen('Flip', Display.window);

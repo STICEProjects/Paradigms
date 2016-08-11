@@ -31,6 +31,12 @@ function staging_system()
     Subject.session = str2double(answer{2});
     Subject.mri = logical(str2double(answer{3}));
     
+    Defaultjoy.mac = 1;
+    Defaultjoy.center = [672 31];
+    Defaultjoy.xmod = .001;
+    Defaultjoy.ymod = .001;
+    Defaultjoy.deadzone = 3000;
+    
     %{
     
     a = str2double(negbehav);
@@ -49,7 +55,7 @@ function staging_system()
     Display = screen_init();
     
     disp('[Press any key to begin running the test]');
-    KbName;
+    %KbName;
    
         
     %pause(2);
@@ -58,12 +64,15 @@ function staging_system()
     Gamepad();
     
     Joyconfig = joystick_calibration(Display, 'mac');
-    KbName
-    disp(Display)
 
-    %exposure(Display, Joyconfig, Subject, path, 'Food');
-    KbName;
-    exposure(Display, Joyconfig, Subject, path, 'Model');
+    disp(Display)
+    
+
+    exposure(Display, Joyconfig, Subject, path, 'Food');
+    %KbName;
+    %exposure(Display, Joyconfig, Subject, path, 'Model');
+    
+    %eating_disorder_valuation(Display, Defaultjoy, Subject, path);
     
     Gamepad('Unplug');
 end

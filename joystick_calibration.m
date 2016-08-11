@@ -12,7 +12,7 @@ function [Defaultjoy] = joystick_calibration(Display, type)
         Defaultjoy.deadzone = 1000;
     elseif isequal(type, 'mac') %CENTER NOT ACCURATE
         Defaultjoy.mac = 1;
-        Defaultjoy.center = [672 31];
+        Defaultjoy.center = [Gamepad('Getaxis', 1, 1) Gamepad('Getaxis', 1, 2)];
         Defaultjoy.xmod = .001;
         Defaultjoy.ymod = .001;
         Defaultjoy.deadzone = 3000;
@@ -29,7 +29,8 @@ function [Defaultjoy] = joystick_calibration(Display, type)
 
     flag = [0 0 0 0];
     keyisdown = 0;
-    while keyisdown == 0
+    time = GetSecs();
+    while 5 > GetSecs() - time
         Screen('DrawDots', Display.window, Cursor.position, 20, Cursor.color, [], 2);
         DrawFormattedText(Display.window,'Control the white dot with the joystick. Please move the dot to each edge of the screen to calibrate','center','center',[150 150 150],50,[],[],1.5);
         Screen('Flip', Display.window);
@@ -55,7 +56,7 @@ function [Defaultjoy] = joystick_calibration(Display, type)
             flag(4) = 1;
         end
         
-        if   KbName % || isequal(flag, [1 1 1 1])
+        if  isequal(flag, [1 1 1 1])
             break
         end
         
@@ -67,7 +68,7 @@ function [Defaultjoy] = joystick_calibration(Display, type)
     
 DrawFormattedText(Display.window,'Thank you, the calibration is complete. Please wait','center','center',[255 255 255],50,[],[],1.5);
 Screen('Flip', Display.window);
-KbName;
+pause(5);
     
     
 

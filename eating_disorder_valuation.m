@@ -8,7 +8,7 @@ function eating_disorder_valuation(Display, Joyconfig, Subject, path)
     Config.stimuluscount = 20;
     
  
-    Stimulus.eds = importdata('Binge.txt'); %%%%
+    Subject.eds = importdata('Binge.txt'); %%%%
     Config.edcount = length(Subject.eds);
     Stimulus.scenarios = importdata('scenarios.txt');
     Config.scenariocount = length(Stimulus.scenarios);
@@ -24,9 +24,9 @@ function eating_disorder_valuation(Display, Joyconfig, Subject, path)
     
     Stimulus.verbage1 = 'How much do you want to...';
     Stimulus.verbage2 = 'Which do you want to do more?';
-    Stimulus.index = randperm(size(scenarios, 1), Config.stimuluscount);
-    Stimulus.ed_behavior_index = randperm(size(eds, 1), Config.edcount);
-    Stimulus.neutral_behavior_index = randperm(size(scenarios, 1), n_neutral);
+    Stimulus.index = randperm(size(Stimulus.scenarios, 1), Config.stimuluscount);
+    Stimulus.ed_behavior_index = randperm(size(Subject.eds, 1), Config.edcount);
+    Stimulus.neutral_behavior_index = randperm(size(Stimulus.scenarios, 1), Config.neutralcount);
     
     
     DrawFormattedText(Display.window,'You are going to imagine yourself in scenarios, then rate how likely you are to engage in a behavior.\n\n You will use a scale from 1 to 9, where 1 is "Not at all likely" and 9 is "Extremely likely."\n\nPress the joystick to continue.','center','center',[255 255 255],50,[],[],1.5);
@@ -37,7 +37,7 @@ function eating_disorder_valuation(Display, Joyconfig, Subject, path)
     Screen('Flip', Display.window);
     joystick_wait(Joyconfig);
     
-    mri_sync();
+    %mri_sync();
     
     DrawFormattedText(Display.window,'The rating task will now begin.\n\nPress the joystick trigger continue.','center','center',[255 255 255],50,[],[],1.5);
     Screen('Flip',Display.window);
@@ -45,7 +45,7 @@ function eating_disorder_valuation(Display, Joyconfig, Subject, path)
     
     for trial = 1:Config.stimuluscount
         scenario = Stimulus.scenarios{trial};
-        ed = Stimulus.eds{trial};
+        ed = Subject.eds{trial};
         neutral = Stimulus.neutrals{trial};
         
          if round(rand(1))

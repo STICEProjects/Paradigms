@@ -86,23 +86,23 @@ function exposure(Display, Joyconfig, Subject, path, arg)
 
 
 
-    Time.start = GetSecs(); %mri_sync(Display);
-    pause(1);
+    Time.start = mri_sync(Display);
 
-    text = char(['We are going to show you pictures of ' arg '. \n\n Press the joystick trigger to continue.']);
+    text = char(['We are going to show you pictures of ' arg '. \n\n Press both joystick triggers to continue.']);
     DrawFormattedText(Display.window,text,'center','center',[255 255 255],50,[],[],1.5);
     Screen('Flip', Display.window);
     joystick_wait(Joyconfig);
     pause(1);
 
-    DrawFormattedText(Display.window,'A green border will appear around the image, you will have one second to react with the joystick. \n\n Press the joystick trigger to continue.','center','center',[255 255 255],50,[],[],1.5);
+    DrawFormattedText(Display.window,'A green border will appear around the image, you will have one second to react with the joystick. \n\n Press both joystick triggers to continue.','center','center',[255 255 255],50,[],[],1.5);
     Screen('Flip', Display.window);
     joystick_wait(Joyconfig);
     pause(1);
 
     if isequal(arg, 'Food')
-        DrawFormattedText(Display.window,'Pull the joystick toward you for foods that you do like. \n\n Push the joystick away from you for images that you dislike.\n\nPress the joystick trigger to begin.','center','center',[255 255 255], 50,[],[],1.5);
-    else
+        DrawFormattedText(Display.window,'Pull the joystick toward you for foods that you do like. \n\n Push the joystick away from you for food that you dislike.\n\nPress both joystick triggers to begin.','center','center',[255 255 255], 50,[],[],1.5);
+    elseif isequal(arg, 'Model')
+        DrawFormattedText(Display.window,'Pull the joystick toward you for models that you find attractive. \n\n Push the joystick away from you for models that you find unattractive.\n\nPress both joystick triggers to begin.','center','center',[255 255 255], 50,[],[],1.5);
         Screen('Flip', Display.window);
         joystick_wait(Joyconfig);
         pause(1);
@@ -183,14 +183,9 @@ function exposure(Display, Joyconfig, Subject, path, arg)
 
     %}
 
-    DrawFormattedText(Display.window,'That concludes this task.','center','center', [255 255 255]);
+    DrawFormattedText(Display.window,'That concludes this task. Please wait','center','center', [255 255 255]);
     Screen('Flip', Display.window);
-    KbName();
-    pause(1);
-
-    Screen('Flip', Display.window);
-
-
+    get_resp();
 end
 
 

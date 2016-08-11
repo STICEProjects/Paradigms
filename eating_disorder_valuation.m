@@ -33,16 +33,17 @@ function eating_disorder_valuation(Display, Joyconfig, Subject, path)
     Screen('Flip', Display.window);
     joystick_wait(Joyconfig);
     
-    DrawFormattedText(Display.window,'You will use joystick and its trigger to select your rating.\n\nPress the joystick trigger to continue.','center','center',[255 255 255],50,[],[],1.5);
+    DrawFormattedText(Display.window,'You will use joystick and its trigger to select your rating.\n\nPress both joystick triggers to continue.','center','center',[255 255 255],50,[],[],1.5);
     Screen('Flip', Display.window);
     joystick_wait(Joyconfig);
     
-    %mri_sync();
+    time = mri_sync();
     
-    DrawFormattedText(Display.window,'The rating task will now begin.\n\nPress the joystick trigger continue.','center','center',[255 255 255],50,[],[],1.5);
+    DrawFormattedText(Display.window,'The rating task will now begin.\n\nPress both joystick triggers continue.','center','center',[255 255 255],50,[],[],1.5);
     Screen('Flip',Display.window);
     joystick_wait(Joyconfig);
     
+    jitter_index = 1;
     for trial = 1:Config.stimuluscount
         scenario = Stimulus.scenarios{trial};
         ed = Subject.eds{trial};
@@ -65,13 +66,16 @@ function eating_disorder_valuation(Display, Joyconfig, Subject, path)
         end
         
         [Data.behavior1_rating, Data.behavior1_responsetime] = display_stimulus_rating(Display, Joyconfig, Stimulus.verbage1, Data.behavior1, 5);
-        draw_fixation_cross(Display, Config.jitter(trial)); %%%%
+        draw_fixation_cross(Display, Config.jitter(jitter_index));
+        jitter_index = jitter_index+1;
         
         [Data.behavior2_rating, Data.behavior2_responsetime] = display_stimulus_rating(Display, Joyconfig, Stimulus.verbage1, Data.behavior2, 5);  
-        draw_fixation_cross(Display, Config.jitter(trial));
+        draw_fixation_cross(Display, Config.jitter(jitter_index));
+        jitter_index = jitter_index+1;
         
         [Data.choice_rating, Data.choice_responsetime] = display_stimulus_choice(Display, Joyconfig, Stimulus.verbage2, Data.choice_left, Data.choice_right, 5);
-        draw_fixation_cross(Display, Config.jitter(trial));
+        draw_fixation_cross(Display, Config.jitter(jitter_index));
+        jitter_index = jitter_index+1;
         
         disp(Data)
     end

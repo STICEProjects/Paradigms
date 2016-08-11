@@ -5,16 +5,21 @@ function [Defaultjoy] = joystick_calibration(Display, type)
         Defaultjoy.xmod = .0004;
         Defaultjoy.ymod = .0004;
         Defaultjoy.deadzone = 5000;
-    elseif isequal(type, 'mri') %CENTER NOT ACCURATE
-        Defaultjoy.center = [33153, 33346]; %MINY = ~13000 MAXY= 41000 MINX = 19000 MAXX = 52000 ADJUST THE CENTER!
-        Defaultjoy.xmod = .0008;
-        Defaultjoy.ymod = .0008;
-        Defaultjoy.deadzone = 1000;
-    elseif isequal(type, 'mac') %CENTER NOT ACCURATE
-        Defaultjoy.mac = 1;
+    elseif isequal(type, 'mri') 
+        DrawFormattedText(Display.window,'Calibrating Joystick center, please do not touch or move the joystick','center','center',[255 255 255],50,[],[],1.5);
+        Screen('Flip', Display.window);
+        pause(3);
         Defaultjoy.center = [Gamepad('Getaxis', 1, 1) Gamepad('Getaxis', 1, 2)];
-        Defaultjoy.xmod = .001;
-        Defaultjoy.ymod = .001;
+        disp(Defaultjoy.center)
+        disp('press y to accept this center, n to discard(will exit program)')
+        if get_resp('y', 'n')
+            disp('joystick calibration discarded, please restart the program');
+            return
+        end
+        
+        Defaultjoy.mac = 1;
+        Defaultjoy.xmod = .0005;
+        Defaultjoy.ymod = .0005;
         Defaultjoy.deadzone = 3000;
         else print('invalid argument'); return;
             
@@ -30,12 +35,11 @@ function [Defaultjoy] = joystick_calibration(Display, type)
     flag = [0 0 0 0];
     keyisdown = 0;
     time = GetSecs();
-    while 5 > GetSecs() - time
+    while 20 > time - GetSecs();
         Screen('DrawDots', Display.window, Cursor.position, 20, Cursor.color, [], 2);
-        DrawFormattedText(Display.window,'Control the white dot with the joystick. Please move the dot to each edge of the screen to calibrate','center','center',[150 150 150],50,[],[],1.5);
+        DrawFormattedText(Display.window,'Control the white dot with the joystick. Please move the dot to each edge of the screen','center','center',[150 150 150],50,[],[],1.5);
         Screen('Flip', Display.window);
         
-        [keyisdown,~,~] = KbCheck;
         
         
         Joy = get_joystick_value(Defaultjoy);
@@ -59,13 +63,22 @@ function [Defaultjoy] = joystick_calibration(Display, type)
         if  isequal(flag, [1 1 1 1])
             break
         end
-        
-       
-        
     end
     
-    
-    
+    DrawFormattedText(Display.window,'When the green dot appears, press both joystick buttons at the same time \n\n (the second button is on the top of the joystick)','center','center',[150 150 150],50,[],[],1.5);
+    for i = 1:3
+        Screen('Flip', Display.window);
+        disp('press any key to continue');
+        get_resp();
+        Cursor.color = [0 255 0];
+        Screen('DrawDots', Display.window, Display.center, 50, Cursor.Color, [], 2);
+        Screen('Flip', Display.window);
+        joystick_wait(Defaultjoy);
+        Cursor.color = [255 0 0];
+        Screen('DrawDots', Display.window, Display.center, 50, Cursor.Color, [], 2);
+        Screen('Flip', Display.window);
+    end
+
 DrawFormattedText(Display.window,'Thank you, the calibration is complete. Please wait','center','center',[255 255 255],50,[],[],1.5);
 Screen('Flip', Display.window);
 pause(5);

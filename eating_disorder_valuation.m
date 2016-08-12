@@ -7,7 +7,9 @@ function eating_disorder_valuation(Display, Joyconfig, Subject, path)
     
     Config.stimuluscount = 20;
     
- 
+    for i = 1:Config.stimuluscount
+        Subject.eds = [Subject.eds; Subject.eds]
+    end
     Subject.eds = randperm(Subject.eds);
     Config.edcount = length(Subject.eds);
     Stimulus.scenarios = randperm(importdata('scenarios.txt'));

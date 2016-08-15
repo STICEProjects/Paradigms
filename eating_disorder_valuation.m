@@ -7,14 +7,11 @@ function eating_disorder_valuation(Display, Joyconfig, Subject, path)
     
     Config.stimuluscount = 20;
     
-    for i = 1:Config.stimuluscount
-        Subject.eds = [Subject.eds; Subject.eds]
-    end
-    Subject.eds = randperm(Subject.eds);
+    %Subject.eds = randperm(Subject.eds);
     Config.edcount = length(Subject.eds);
-    Stimulus.scenarios = randperm(importdata('scenarios.txt'));
+    Stimulus.scenarios = importdata('scenarios.txt');
     Config.scenariocount = length(Stimulus.scenarios);
-    Stimulus.neutrals = randperm(importdata('neutral_behav.txt'));
+    Stimulus.neutrals = importdata('neutral_behav.txt');
     Config.neutralcount = length(Stimulus.neutrals);
     
     if Subject.mri == 1
@@ -61,7 +58,7 @@ function eating_disorder_valuation(Display, Joyconfig, Subject, path)
         end
         
         if round(rand(1))
-            Data.choice_left = ed;
+            Data.choice_left = ed;  
             Data.choice_right = neutral;
         else
             Data.choice_left = neutral;

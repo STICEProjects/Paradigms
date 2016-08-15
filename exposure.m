@@ -121,11 +121,12 @@ function exposure(Display, Joyconfig, Subject, path, arg)
     if isequal(arg, 'Food')
         DrawFormattedText(Display.window,'Pull the joystick toward you for foods that you do like. \n\n Push the joystick away from you for food that you dislike.\n\nPress both joystick triggers to begin.','center','center',[255 255 255], 50,[],[],1.5);
     elseif isequal(arg, 'Model')
+    end
         DrawFormattedText(Display.window,'Pull the joystick toward you for models that you find attractive. \n\n Push the joystick away from you for models that you find unattractive.\n\nPress both joystick triggers to begin.','center','center',[255 255 255], 50,[],[],1.5);
         Screen('Flip', Display.window);
         joystick_wait(Joyconfig);
         pause(1);
-    end
+
 
 
     for i = 1:Config.trials
@@ -151,7 +152,7 @@ function exposure(Display, Joyconfig, Subject, path, arg)
             Time.response = GetSecs() - Time.onset;
 
             Input = get_joystick_value(Joyconfig);
-            if Input.y > 16 * Joyconfig.ymod
+            if Input.y > 30 * Joyconfig.ymod
                 Screen('FillRect', Display.window, [0 255 0], Config.largeimagerect + [-75 -75 75 75]);
                 Screen('DrawTexture', Display.window, texture, [], Config.largeimagerect);
                 Screen('Flip',Display.window);
@@ -161,7 +162,7 @@ function exposure(Display, Joyconfig, Subject, path, arg)
                 Trial.data(i)
                 pause(.5);
                 break
-            elseif Input.y < -8 * Joyconfig.ymod
+            elseif Input.y < -30 * Joyconfig.ymod
                 Screen('FillRect', Display.window, [0 255 0], Config.smallimagerect + [-25 -25 25 25]);
                 Screen('DrawTexture',Display.window, texture, [], Config.smallimagerect);
                 Screen('Flip',Display.window);
@@ -196,12 +197,16 @@ function exposure(Display, Joyconfig, Subject, path, arg)
 
     fields = transpose(fieldnames(Trial.data));
     out_data = transpose(struct2cell(transpose(Trial.data)));
-    xlswrite(xls_savename, [fields; out_data]);
-    disp('saved xls file');
+    %if Joyconfig.mac == 1
+        %xlwrite(xls_savename, [fields; out_data]);
+    %else
+        %xlswrite(xls_savename, [fields; out_data]);
+    %end
+    %disp('saved xls file');
 
     DrawFormattedText(Display.window,'That concludes this task. Please wait','center','center', [255 255 255]);
     Screen('Flip', Display.window);
-    get_resp();
+    KbName();
 end
 
 

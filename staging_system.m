@@ -5,19 +5,19 @@
 
 %%paradigm is a cell array of function handles that accept the argument
 
-%%list: Display information Struct, Subject information Struct, and
+%%list: Display information Struct, Subject informatio n Struct, and
 %%a filepath string. 
 
 
 function staging_system()
 
-
+    
     rng('shuffle'); 
     pause('on');
     prompt={'SUBJECT ID' 'Session' 'MRI (1 = Y, 0 = N)'};
     defAns={'4444' '0' '0'};
     
-    textfileNames = {'Binge.txt','Sick.txt','Lax.txt', 'Dietpills.txt', 'Fast.txt', 'Exercise.txt'};
+    textfileNames = {'Binge.txt','Sick.txt', 'Lax.txt', 'Dietpills.txt', 'Fast.txt', 'Exercise.txt'};
     prompt2={'Binges' 'Sick' 'Laxatives/diruretics' 'Diet pills' 'Fasting' 'Exercise'};
     behaviors={'0' '0' '0' '0' '0' '0'};
 
@@ -25,8 +25,9 @@ function staging_system()
     answer=inputdlg(prompt,'Please input subject info',1,defAns);
     
     negbehav= inputdlg(prompt2,'Please input behaviors',1,behaviors);
+    [path, ~, ~] = fileparts(which('staging_system.m'));
     
-      
+    cd(char([path '/Data/Behavior']));
     Subject.id = str2double(answer{1});
     Subject.session = str2double(answer{2});
     Subject.mri = logical(str2double(answer{3}));
@@ -34,24 +35,21 @@ function staging_system()
     a=logical(str2double(negbehav));
 
     Subject.eds = {};
-    for i = 1:size(a,1)
-        if (a(i))
-            Subject.eds = [Subject.eds; importdata(textfileNames{i})];
+    for n = 1:20
+        for i = 1:size(a,1)
+            if (a(i))
+                Subject.eds = [Subject.eds; importdata(textfileNames{i})];
+            end
         end
     end
 
-
-    
-    %} 
-    
-    [path, ~, ~] = fileparts(which('staging_system.m'));
-    
-    Display = screen_init('debug');
+    Display = screen_init( );
     
     disp('[Press any key to begin running the test]');
-    get_resp();
+    KbName();
+    pause(.3);
     
-    Joyconfig = joystick_calibration(Display, 'logitech');
+    Joyconfig = joystick_calibration(Display, 'mri');
 
     disp(Display)
     
@@ -67,7 +65,7 @@ end
     
     
     
-    
+   
             
       
 

@@ -1,7 +1,7 @@
 function exposure(Display, Joyconfig, Subject, path, arg)
 
     d = clock;
-    Config.imagecount = 3;
+    Config.imagecount = 20;
     Config.trials = 2*Config.imagecount;
     Config.trialdur = 2;
     Config.rate_dur = 1;
@@ -45,6 +45,9 @@ function exposure(Display, Joyconfig, Subject, path, arg)
 
 
     Pics.filename = sprintf('PicRate_%s%d.mat', arg, Subject.id);
+    if isequal(arg, 'Model');
+        Pics.filename = sprintf('PicRate_%s%d.mat', 'Mod', Subject.id);
+    end
     try
         p = open(Pics.filename);
     catch
@@ -69,10 +72,14 @@ function exposure(Display, Joyconfig, Subject, path, arg)
     end
 
     cd(Pics.dir);
-
-    Pics.high = struct('name',{p.PicRating_Food.H(1:Config.imagecount).name}');
-    Pics.low = struct('name',{p.PicRating_Food.U(1:Config.imagecount).name}');
-
+    if isequal(arg, 'Food');
+        Pics.high = struct('name',{p.PicRating_Food.H(1:Config.imagecount).name}');
+        Pics.low = struct('name',{p.PicRating_Food.U(1:Config.imagecount).name}');
+    else 
+        Pics.high = struct('name',{p.PicRating_Mod.Avg(1:Config.imagecount).name}');
+        Pics.low = struct('name',{p.PicRating_Mod.Thin(1:Config.imagecount).name}');
+    end
+        
     if isempty(Pics.high) || isempty(Pics.low)
         error('Could not find pics. Please ensure pictures are found in a folder names IMAGES within the folder containing the .m task file.');
     end
@@ -105,9 +112,11 @@ function exposure(Display, Joyconfig, Subject, path, arg)
 
 
 
-    Time.start = mri_sync(Display);
-
-    text = char(['We are going to show you pictures of ' arg '. \n\n Press both joystick triggers to continue.']);
+    Time.start = GetSecs();
+    if isequal(arg, 'Food');
+        text = char('We are going to show you pictures of food. \n\n Press both joystick triggers to continue.');
+    else text = char('We are going to show you pictures of models. \n\n Press both joystick triggers to continue.');
+    end
     DrawFormattedText(Display.window,text,'center','center',[255 255 255],50,[],[],1.5);
     Screen('Flip', Display.window);
     joystick_wait(Joyconfig);
@@ -121,11 +130,11 @@ function exposure(Display, Joyconfig, Subject, path, arg)
     if isequal(arg, 'Food')
         DrawFormattedText(Display.window,'Pull the joystick toward you for foods that you do like. \n\n Push the joystick away from you for food that you dislike.\n\nPress both joystick triggers to begin.','center','center',[255 255 255], 50,[],[],1.5);
     elseif isequal(arg, 'Model')
+    DrawFormattedText(Display.window,'Pull the joystick toward you for models that you find attractive. \n\n Push the joystick away from you for models that you find unattractive.\n\nPress both joystick triggers to begin.','center','center',[255 255 255], 50,[],[],1.5);
     end
-        DrawFormattedText(Display.window,'Pull the joystick toward you for models that you find attractive. \n\n Push the joystick away from you for models that you find unattractive.\n\nPress both joystick triggers to begin.','center','center',[255 255 255], 50,[],[],1.5);
-        Screen('Flip', Display.window);
-        joystick_wait(Joyconfig);
-        pause(1);
+    Screen('Flip', Display.window);
+    joystick_wait(Joyconfig);
+    pause(1);
 
 
 
@@ -183,7 +192,7 @@ function exposure(Display, Joyconfig, Subject, path, arg)
     savepath = char([path '/Data/' arg '/Results']);
 
     cd(savepath)
-    savename = ['SimpExp_Food_' num2str(Subject.id)];
+    savename = ['SimpExp_Food_' num2str(Subject.id) '_Session_' num2str(Subject.session)];
 
     if exist(savename,'file')== 2;
         savename = ['SimpExp_Food_' num2str(Subject.id) '_' sprintf('%s_%2.0f%02.0f',Config.date,d(4),d(5))];
@@ -197,16 +206,12 @@ function exposure(Display, Joyconfig, Subject, path, arg)
 
     fields = transpose(fieldnames(Trial.data));
     out_data = transpose(struct2cell(transpose(Trial.data)));
-    %if Joyconfig.mac == 1
-        %xlwrite(xls_savename, [fields; out_data]);
-    %else
-        %xlswrite(xls_savename, [fields; out_data]);
-    %end
-    %disp('saved xls file');
+    xlswrite(xls_savename, [fields; out_data]);
+    disp('saved xls file');
 
     DrawFormattedText(Display.window,'That concludes this task. Please wait','center','center', [255 255 255]);
     Screen('Flip', Display.window);
-    KbName();
+    pause(1);    
 end
 
 

@@ -10,7 +10,8 @@
 
 
 function staging_system()
-
+    addpath('C:\Users\pl7678\Documents\GitHub\STICEprojects\STICElib');
+    addpath('C:\Users\pl7678\Documents\GitHub\STICEprojects\Paradigms');
     
     rng('shuffle'); 
     pause('on');
@@ -35,29 +36,41 @@ function staging_system()
     a=logical(str2double(negbehav));
 
     Subject.eds = {};
-    for n = 1:20
-        for i = 1:size(a,1)
-            if (a(i))
-                Subject.eds = [Subject.eds; importdata(textfileNames{i})];
-            end
+    for i = 1:size(a,1)
+        if (a(i))
+            Subject.eds = [Subject.eds; importdata(textfileNames{i})];  
         end
     end
+    Subject.eds = Subject.eds(randperm(numel(Subject.eds)));
 
-    Display = screen_init( );
     
-    disp('[Press any key to begin running the test]');
-    KbName();
+    disp('Press any key to begin running the test');
+    get_resp();
     pause(.3);
     
-    Joyconfig = joystick_calibration(Display, 'mri');
-
-    disp(Display)
+    Display = screen_init();
+    Joyconfig = joystick_calibration(Display, 'logitech');
+    sca
+    disp('Press any key to continue to the next Paradigm')
+    get_resp();
     
-
-    %exposure(Display, Joyconfig, Subject, path, 'Food'); 
-    %exposure(Display, Joyconfig, Subject, path, 'Model');
+    Display = screen_init();
+    exposure(Display, Joyconfig, Subject, path, 'Food');
+    sca
+    disp('Press any key to continue to the next Paradigm')
+    get_resp(); 
     
+    Display = screen_init();
+    exposure(Display, Joyconfig, Subject, path, 'Model');
+    sca
+    disp('Press any key to continue to the next Paradigm')
+    get_resp();
+    
+    Display = screen_init();
     eating_disorder_valuation(Display, Joyconfig , Subject, path);
+    sca
+    disp('Session complete. Press any key to continue to exit')
+    get_resp();
 end
     
                                     

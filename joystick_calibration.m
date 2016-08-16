@@ -3,8 +3,8 @@ function [Defaultjoy] = joystick_calibration(Display, type)
     if isequal(type, 'logitech') 
         Defaultjoy.mac = 0;
         Defaultjoy.center = [32767, 32767];
-        Defaultjoy.xmod = .0004;
-        Defaultjoy.ymod = .0004;
+        Defaultjoy.xmod = .00005;
+        Defaultjoy.ymod = .00005;
         Defaultjoy.deadzone = 5000;
     elseif isequal(type, 'mri') 
         Gamepad();
@@ -37,7 +37,7 @@ function [Defaultjoy] = joystick_calibration(Display, type)
     flag = [0 0 0 0];
 
     time = GetSecs();
-    %{
+    
     while 15 > GetSecs() - time;
         Screen('DrawDots', Display.window, Cursor.position, 20, Cursor.color, [], 2);
         DrawFormattedText(Display.window,'Control the white dot with the joystick. Please move the dot to each edge of the screen','center','center',[150 150 150],50,[],[],1.5);
@@ -46,7 +46,7 @@ function [Defaultjoy] = joystick_calibration(Display, type)
         
         
         Joy = get_joystick_value(Defaultjoy);
-        Cursor.position = [Joy.x + Cursor.position(1), Joy.y + Cursor.position(2)];
+        Cursor.position = [Joy.x*4 + Cursor.position(1), Joy.y*4 + Cursor.position(2)];
         Cursor.position(1) = minmaxcheck(10, 1900, Cursor.position(1));
         Cursor.position(2) = minmaxcheck(10, 1060, Cursor.position(2));
         
@@ -68,29 +68,29 @@ function [Defaultjoy] = joystick_calibration(Display, type)
         end
     end
     
-    DrawFormattedText(Display.window,'When the green dot appears, press both joystick buttons at the same time \n\n (the second button is on the top of the joystick)','center','center',[150 150 150],50,[],[],1.5);
+    
     for i = 1:3
-        DrawFormattedText(Display.window,'When the green dot appears, press both joystick buttons at the same time \n\n (the second button is on the top of the joystick)','center','center',[150 150 150],50,[],[],1.5);
+        DrawFormattedText(Display.window,'When the green dot appears, press both joystick buttons at the same time \n\n (the second button is underneath your thumb)','center','center',[150 150 150],50,[],[],1.5);
         Screen('Flip', Display.window);
-        disp('press any key to continue');
-        KbName();
+        pause(3);
         
         Cursor.color = [0 255 0];
-        DrawFormattedText(Display.window,'When the green dot appears, press both joystick buttons at the same time \n\n (the second button is on the top of the joystick)','center','center',[150 150 150],50,[],[],1.5);
+        DrawFormattedText(Display.window,'When the green dot appears, press both joystick buttons at the same time \n\n (the second button is underneath your thumb)','center','center',[150 150 150],50,[],[],1.5);
         Screen('DrawDots', Display.window, Display.center, 20, Cursor.color, [], 2);
         Screen('Flip', Display.window);
         joystick_wait(Defaultjoy);
         
         Cursor.color = [255 0 0];
-        DrawFormattedText(Display.window,'When the green dot appears, press both joystick buttons at the same time \n\n (the second button is on the top of the joystick)','center','center',[150 150 150],50,[],[],1.5);
+        DrawFormattedText(Display.window,'When the green dot appears, press both joystick buttons at the same time \n\n (the second button is underneath your thumb)','center','center',[150 150 150],50,[],[],1.5);
         Screen('DrawDots', Display.window, Display.center, 20, Cursor.color, [], 2);
         Screen('Flip', Display.window);
     end
-    %}
+    
 
 DrawFormattedText(Display.window,'Thank you, the calibration is complete. Please wait','center','center',[255 255 255],50,[],[],1.5);
 Screen('Flip', Display.window);
 pause(2);
+end
     
     
 

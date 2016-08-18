@@ -61,8 +61,8 @@ function exposure(Display, Joyconfig, Subject, path, arg)
                 p.PicRating_Food.H = dir('He*');
                 p.PicRating_Food.U = dir('Binge*');
             elseif isequal(arg, 'Model')
-                p.PicRating_Food.H = dir('Av*');
-                p.PicRating_Food.U = dir('Th*');
+                p.PicRating_Mod.H = dir('Av*');
+                p.PicRating_Mod.U = dir('Th*');
             end
 
         else
@@ -76,8 +76,8 @@ function exposure(Display, Joyconfig, Subject, path, arg)
         Pics.high = struct('name',{p.PicRating_Food.H(1:Config.imagecount).name}');
         Pics.low = struct('name',{p.PicRating_Food.U(1:Config.imagecount).name}');
     else 
-        Pics.high = struct('name',{p.PicRating_Mod.Avg(1:Config.imagecount).name}');
-        Pics.low = struct('name',{p.PicRating_Mod.Thin(1:Config.imagecount).name}');
+        Pics.high = struct('name',{p.PicRating_Mod.H(1:Config.imagecount).name}');
+        Pics.low = struct('name',{p.PicRating_Mod.U(1:Config.imagecount).name}');
     end
         
     if isempty(Pics.high) || isempty(Pics.low)

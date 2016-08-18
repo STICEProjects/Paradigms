@@ -1,4 +1,3 @@
-
 %%Initializes psychtoolbox, prompts tester for subject information, and
 %%begins running the inputted paradigm(s).
 
@@ -43,34 +42,22 @@ function staging_system()
     end
     Subject.eds = Subject.eds(randperm(numel(Subject.eds)));
 
-    
-    disp('Press any key to begin running the test');
-    get_resp();
+    Display = screen_init();
+    input('Press enter to begin running the test');
     pause(.3);
+
+    Joyconfig = joystick_calibration(Display, 'mri');
+    input('Press enter to begin running the test');
     
-    Display = screen_init();
-    Joyconfig = joystick_calibration(Display, 'logitech');
-    sca
-    disp('Press any key to continue to the next Paradigm')
-    get_resp();
-    
-    Display = screen_init();
-    exposure(Display, Joyconfig, Subject, path, 'Food');
-    sca
-    disp('Press any key to continue to the next Paradigm')
-    get_resp(); 
-    
-    Display = screen_init();
+    %exposure(Display, Joyconfig, Subject, path, 'Food');
+    %input('Press enter to begin running the test');
+
     exposure(Display, Joyconfig, Subject, path, 'Model');
-    sca
-    disp('Press any key to continue to the next Paradigm')
-    get_resp();
+    input('Press enter to begin running the test');
     
-    Display = screen_init();
     eating_disorder_valuation(Display, Joyconfig , Subject, path);
-    sca
-    disp('Session complete. Press any key to continue to exit')
-    get_resp();
+    input('Press enter to begin running the test');
+
 end
     
                                     

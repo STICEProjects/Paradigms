@@ -16,14 +16,15 @@ function [Defaultjoy] = joystick_calibration(Display, type)
         disp('press y to accept this center, n to discard(will exit program)')
         if isequal(KbName(), 'n')
             disp('joystick calibration discarded, please restart the program');
-            quit();
+            return;
         end
         
         Defaultjoy.mac = 1;
         Defaultjoy.xmod = .00001;
         Defaultjoy.ymod = .00001;
         Defaultjoy.deadzone = 3000;
-        else print('invalid argument'); return;
+        else print('invalid argument'); 
+            return;
             
     end
 

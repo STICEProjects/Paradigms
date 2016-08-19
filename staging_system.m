@@ -42,16 +42,19 @@ function staging_system()
     end
     Subject.eds = Subject.eds(randperm(numel(Subject.eds)));
 
-    Display = screen_init();
+    Display = screen_init('debug');
     input('Press enter to begin running the test');
     pause(.3);
 
-    Joyconfig = joystick_calibration(Display, 'mri');
+    Joyconfig = joystick_calibration(Display, 'logitech');
     input('Press enter to begin running the test');
     
-    %exposure(Display, Joyconfig, Subject, path, 'Food');
-    %input('Press enter to begin running the test');
-
+    try
+    exposure(Display, Joyconfig, Subject, path, 'Food');
+    catch
+        
+    input('Press enter to begin running the test');
+       
     exposure(Display, Joyconfig, Subject, path, 'Model');
     input('Press enter to begin running the test');
     

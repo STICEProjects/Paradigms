@@ -51,9 +51,10 @@ function exposure(Display, Joyconfig, Subject, path, arg)
     try
         p = open(Pics.filename);
     catch
-            warning('Attemped to open file called "%s" for Subject #%d. Could not find and/or open this training rating file. Double check that you have typed in the subject number appropriately.',Pics.filename, Subject.id);
+        DrawFormattedText(Display.window,'Could not load images, press 1 to continue with random images, press 2 to skip this test','center','center',[255 255 255],50,[],[],1.5);
+        Screen('Flip', Display.window);
         commandwindow;
-        randopics = input('Would you like to continue with a random selection of images? [1 = Yes, 0 = No]');
+        randopics = get_resp('0)', '1!');
         if randopics == 1
             cd(Pics.dir)
             p = struct;
@@ -76,8 +77,8 @@ function exposure(Display, Joyconfig, Subject, path, arg)
         Pics.high = struct('name',{p.PicRating_Food.H(1:Config.imagecount).name}');
         Pics.low = struct('name',{p.PicRating_Food.U(1:Config.imagecount).name}');
     else 
-        Pics.high = struct('name',{p.PicRating_Mod.H(1:Config.imagecount).name}');
-        Pics.low = struct('name',{p.PicRating_Mod.U(1:Config.imagecount).name}');
+        Pics.high = struct('name',{p.PicRating_Mod.Avg(1:Config.imagecount).name}');
+        Pics.low = struct('name',{p.PicRating_Mod.Thin(1:Config.imagecount).name}');
     end
         
     if isempty(Pics.high) || isempty(Pics.low)
